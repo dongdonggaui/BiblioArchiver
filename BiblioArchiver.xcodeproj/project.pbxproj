@@ -453,12 +453,12 @@
 					"$(inherited)",
 					"${SDKROOT}/usr/include/libxml2",
 				);
-				INFOPLIST_FILE = BiblioArchiver/Info.plist;
+				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.hly.BiblioArchiver;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lukeqqi.BiblioArchiver;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_INCLUDE_PATHS = "${inherited}";
@@ -484,12 +484,12 @@
 					"$(inherited)",
 					"${SDKROOT}/usr/include/libxml2",
 				);
-				INFOPLIST_FILE = BiblioArchiver/Info.plist;
+				INFOPLIST_FILE = Sources/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.hly.BiblioArchiver;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lukeqqi.BiblioArchiver;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_INCLUDE_PATHS = "${inherited}";
@@ -500,7 +500,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0371F5A9F822C888672C6B1E /* Pods-BiblioArchiverTests.debug.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = BiblioArchiverTests/Info.plist;
+				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hly.BiblioArchiverTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -511,7 +511,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D3AF589BFFA181F73EBC8B0B /* Pods-BiblioArchiverTests.release.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = BiblioArchiverTests/Info.plist;
+				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hly.BiblioArchiverTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
