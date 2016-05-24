@@ -1,0 +1,6 @@
+framework module Pods_BiblioArchiverTests {
+  umbrella header "Pods-BiblioArchiverTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
