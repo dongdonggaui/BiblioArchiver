@@ -23,7 +23,7 @@ platform :ios do
   end
 
   desc "Runs all the tests"
-  lane :test do
+  lane :test_all_schemes do
     scan(scheme: "BiblioArchiver", clean: true)
   end
 
@@ -55,12 +55,12 @@ platform :ios do
       target_version = options[:version]
       raise "The version is missed. Use `fastlane release version:{version_number}`.`" if target_version.nil?
 
-      upgrade_swift_lint
+      # upgrade_swift_lint
 
       ensure_git_branch
       ensure_git_status_clean
 
-      test
+      test_all_schemes
       carthage_lint
 
       sync_build_number_to_git
