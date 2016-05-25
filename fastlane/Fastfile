@@ -51,8 +51,8 @@ platform :ios do
   end
 
   desc "Push to pod ignore warnings"
-  lane :pop_push_ignore_warnings do
-      Actions.sh("pod trunk push --allow-warnings BiblioArchiver.podspec")
+  lane :pod_push_ignore_warnings do
+      Actions.sh("cd .. && pod trunk push --allow-warnings BiblioArchiver.podspec && cd fastlane")
   end
 
   desc "test"
