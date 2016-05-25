@@ -6,6 +6,7 @@ module Fastlane
         yaml = File.read(params[:file])
         data = YAML.load(yaml)
         version = data["version"]
+        puts "version in the input file : #{version}, params version : #{params[:version]}"
         raise "The version should match in the input file".red unless (version and version == params[:version])
 
         title = "#{version}"

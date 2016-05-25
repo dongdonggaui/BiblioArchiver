@@ -55,6 +55,11 @@ platform :ios do
       Actions.sh("pod trunk push --allow-warnings BiblioArchiver.podspec")
   end
 
+  desc "test"
+  lane :test_ext do
+    extract_current_change_log
+  end
+
   desc "Release new version"
   lane :release do |options|
       target_version = options[:version]
