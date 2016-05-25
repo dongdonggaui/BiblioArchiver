@@ -50,6 +50,11 @@ platform :ios do
       pod_lint
   end
 
+  desc "Push to pod ignore warnings"
+  lane :pop_push_ignore_warnings do
+      Actions.sh("pod trunk push --allow-warnings BiblioArchiver.podspec")
+  end
+
   desc "Release new version"
   lane :release do |options|
       target_version = options[:version]
@@ -84,7 +89,7 @@ platform :ios do
       description: release_log[:text]
       )
 
-      pod_push
+      pod_push_ignore_warnings
   end
 
   lane :podpush do
