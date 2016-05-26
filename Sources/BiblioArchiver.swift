@@ -10,10 +10,10 @@ import Foundation
 import Fuzi
 
 /// Archive completion handler block
-public typealias ArchiveCompletionHandler = (webarchiveData: NSData?, error: ArchiveErrorType?) -> ()
+public typealias ArchiveCompletionHandler = (webarchiveData: NSData?, metaData: [String: String?]?, error: ArchiveErrorType?) -> ()
 
 /// Fetch resource paths completion handler block
-public typealias FetchResourcePathCompletionHandler = (data: NSData?, resources: [String]?, error: ArchiveErrorType?) -> ()
+public typealias FetchResourcePathCompletionHandler = (data: NSData?, metaData: [String: String?]?, resources: [String]?, error: ArchiveErrorType?) -> ()
 
 /// Error type
 public enum ArchiveErrorType: ErrorType {
@@ -23,6 +23,9 @@ public enum ArchiveErrorType: ErrorType {
     case FetchResourceFailed
     case PlistSerializeFailed
 }
+
+/// Meta data key 'title'
+public let ArchivedWebpageMetaKeyTitle = "title"
 
 /// Resource fetch options
 public struct ResourceFetchOptions: OptionSetType {
@@ -73,13 +76,13 @@ public class Archiver {
      */
     public static func archiveWebpageFormUrl(url: NSURL, completionHandler: ArchiveCompletionHandler) {
 
-        self.resourcePathsFromUrl(url, fetchOptions: defaultFetchOptions) { (data, resources, error) in
+        self.resourcePathsFromUrl(url, fetchOptions: defaultFetchOptions) { (data, metaData, resources, error) in
             guard let resources = resources else {
                 printLog("resource fetch error : \(error)")
-                completionHandler(webarchiveData: nil, error: .FetchResourceFailed)
+                completionHandler(webarchiveData: nil, metaData: nil, error: .FetchResourceFailed)
                 return
             }
-
+            
             let resourceInfo = NSMutableDictionary(capacity: resources.count)
 
             let assembleQueue = dispatch_queue_create(kResourceAssembleQueue, nil)
@@ -142,10 +145,10 @@ public class Archiver {
 
                 do {
                     let webarchiveData = try NSPropertyListSerialization.dataWithPropertyList(webarchive, format: .BinaryFormat_v1_0, options: 0)
-                    completionHandler(webarchiveData: webarchiveData, error: nil)
+                    completionHandler(webarchiveData: webarchiveData, metaData: metaData, error: nil)
                 } catch { error
                     printLog("plist serialize error : \(error)")
-                    completionHandler(webarchiveData: nil, error: .PlistSerializeFailed)
+                    completionHandler(webarchiveData: nil, metaData: metaData, error: .PlistSerializeFailed)
                 }
             })
         }
@@ -158,7 +161,7 @@ public class Archiver {
      */
     public static func logHTMLResources(fromUrl url: NSURL) {
 
-        self.resourcePathsFromUrl(url, fetchOptions: [.FetchImage, .FetchJs, .FetchCss]) { (data, resources, error) in
+        self.resourcePathsFromUrl(url, fetchOptions: [.FetchImage, .FetchJs, .FetchCss]) { (data, metaData, resources, error) in
             guard let resources = resources else {
                 printLog("resource fetch error : \(error)")
                 return
@@ -182,23 +185,28 @@ public class Archiver {
 
             guard let htmlData = data else {
                 printLog("fetch html error : \(error)")
-                completionHandler(data: data, resources: nil, error: ArchiveErrorType.FetchHTMLError)
+                completionHandler(data: data, metaData: nil, resources: nil, error: ArchiveErrorType.FetchHTMLError)
                 return
             }
 
             guard let html = (NSString(data: htmlData, encoding: NSUTF8StringEncoding) as? String) else {
                 printLog("html invalid")
-                completionHandler(data: data, resources: nil, error: ArchiveErrorType.HTMLInvalid)
+                completionHandler(data: data, metaData: nil, resources: nil, error: ArchiveErrorType.HTMLInvalid)
                 return
             }
 
             guard let doc = try? HTMLDocument(string: html, encoding: NSUTF8StringEncoding) else {
                 printLog("init html doc error, html : \(html)")
-                completionHandler(data: data, resources: nil, error: ArchiveErrorType.FailToInitHTMLDocument)
+                completionHandler(data: data, metaData: nil, resources: nil, error: ArchiveErrorType.FailToInitHTMLDocument)
                 return
             }
 
             printLog("html --> \(html)")
+            
+            var metaData = [String: String?]()
+            if let htmlTitle = doc.title {
+                metaData[ArchivedWebpageMetaKeyTitle] = htmlTitle
+            }
 
             var resources: [String] = []
 
@@ -243,7 +251,7 @@ public class Archiver {
                 resources += cssPaths
             }
 
-            completionHandler(data: data, resources: resources, error: nil)
+            completionHandler(data: data, metaData: metaData, resources: resources, error: nil)
         }
         task.resume()
     }
