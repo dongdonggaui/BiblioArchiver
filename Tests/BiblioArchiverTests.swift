@@ -12,6 +12,8 @@ import Mockingjay
 
 class BiblioArchiverTests: XCTestCase {
     
+    let url = NSURL(string: "https://100.com/test.html")!
+    
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -28,7 +30,7 @@ class BiblioArchiverTests: XCTestCase {
     func testHTMLParse() {
         let exceptation = expectationWithDescription("Wait for downloading html")
         
-        Archiver.resourcePathsFromUrl(NSURL(string: "https://100.com/test.html")!, fetchOptions: [.FetchImage, .FetchCss, .FetchJs]) { (data, resources, error) in
+        Archiver.resourcePathsFromUrl(NSURL(string: "https://100.com/test.html")!, fetchOptions: [.FetchImage, .FetchCss, .FetchJs]) { (data, metaData, resources, error) in
             
             guard let resources = resources else {
                 XCTAssert(false, "Resources parse result should not be nil")
@@ -59,16 +61,15 @@ class BiblioArchiverTests: XCTestCase {
         waitForExpectationsWithTimeout(5, handler: nil)
     }
     
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-    
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            // Put the code you want to measure the time of here.
+    func testMetaDataTitle() {
+        let expectation = expectationWithDescription("wait for downloading html")
+        
+        Archiver.resourcePathsFromUrl(url, fetchOptions: Archiver.defaultFetchOptions) { (data, metaData, resources, error) in
+            let title = "This is a test"
+            XCTAssert(metaData![ArchivedWebpageMetaKeyTitle]! == title, "Message should be fetched correctly")
+            
+            expectation.fulfill()
         }
+        waitForExpectationsWithTimeout(5, handler: nil)
     }
-    
 }
