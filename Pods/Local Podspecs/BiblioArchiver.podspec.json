@@ -1,0 +1,27 @@
+{
+  "name": "BiblioArchiver",
+  "version": "0.0.1",
+  "summary": "A short description of BiblioArchiver.",
+  "description": "123123123123123123123",
+  "homepage": "http://github.com/dongdonggaui/BiblioArchiver",
+  "license": "MIT",
+  "authors": {
+    "iOS持续集成机器人": "ios_support@douyu.tv"
+  },
+  "source": {
+    "git": "http://github.com/dongdonggaui/BiblioArchiver.git",
+    "tag": "0.0.1"
+  },
+  "source_files": "Sources/*.{h,swift}",
+  "dependencies": {
+    "Fuzi": [
+      "2.2.1"
+    ]
+  },
+  "platforms": {
+    "osx": null,
+    "ios": null,
+    "tvos": null,
+    "watchos": null
+  }
+}

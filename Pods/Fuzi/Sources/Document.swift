@@ -27,20 +27,20 @@ open class XMLDocument {
   // MARK: - Document Attributes
   /// The XML version.
   open fileprivate(set) lazy var version: String? = {
-    return self.cDocument != nil ?(^-^self.cDocument?.pointee.version) :nil
+    return ^-^self.cDocument.pointee.version
   }()
   
   /// The string encoding for the document. This is NSUTF8StringEncoding if no encoding is set, or it cannot be calculated.
   open fileprivate(set) lazy var encoding: String.Encoding = {
-    if self.cDocument != nil && self.cDocument?.pointee.encoding != nil {
-      let encodingName = ^-^self.cDocument?.pointee.encoding
-      let encoding = CFStringConvertIANACharSetNameToEncoding(encodingName)
+    if let encodingName = ^-^self.cDocument.pointee.encoding {
+      let encoding = CFStringConvertIANACharSetNameToEncoding(encodingName as CFString?)
       if encoding != kCFStringEncodingInvalidId {
-        return CFStringConvertEncodingToNSStringEncoding(encoding)
+        return String.Encoding(rawValue: UInt(CFStringConvertEncodingToNSStringEncoding(encoding)))
       }
     }
     return String.Encoding.utf8
   }()
+
   // MARK: - Accessing the Root Element
   /// The root element of the document.
   open fileprivate(set) var root: XMLElement?
@@ -62,7 +62,7 @@ open class XMLDocument {
   }()
   
   // MARK: - Creating XML Documents
-  fileprivate let cDocument: xmlDocPtr?
+  fileprivate let cDocument: xmlDocPtr
   
   /**
   Creates and returns an instance of XMLDocument from an XML string, throwing XMLError if an error occured while parsing the XML.
@@ -91,7 +91,12 @@ open class XMLDocument {
   - returns: An `XMLDocument` with the contents of the specified XML string.
   */
   public convenience init(data: Data) throws {
-    try self.init(cChars: [CChar](UnsafeBufferPointer(start: (data as NSData).bytes.bindMemory(to: CChar.self, capacity: data.count), count: data.count)))
+    let cChars = data.withUnsafeBytes { (bytes: UnsafePointer<Int8>) -> [CChar] in
+        let buffer = UnsafeBufferPointer(start: bytes, count: data.count)
+        return [CChar](buffer)
+    }
+    
+    try self.init(cChars: cChars)
   }
   
   /**
@@ -107,31 +112,28 @@ open class XMLDocument {
     let options = Int32(XML_PARSE_NOWARNING.rawValue | XML_PARSE_NOERROR.rawValue | XML_PARSE_RECOVER.rawValue)
     try self.init(cChars: cChars, options: options)
   }
-  
+
   fileprivate convenience init(cChars: [CChar], options: Int32) throws {
-    try self.init(parseFunction: xmlReadMemory, cChars: cChars, options: options)
-  }
-  
-  fileprivate convenience init(parseFunction: (UnsafePointer<Int8>, Int32, UnsafePointer<Int8>, UnsafePointer<Int8>, Int32) -> xmlDocPtr, cChars: [CChar], options: Int32) throws {
-    let document = parseFunction(UnsafePointer(cChars), Int32(cChars.count), "", nil, options)
-    if document == nil {
-      throw XMLError.lastError(.parserFailure)
-    } else {
-      xmlResetLastError()
+    guard let document = type(of: self).parse(cChars: cChars, size: cChars.count, options: options) else {
+      throw XMLError.lastError(defaultError: .parserFailure)
     }
+    xmlResetLastError()
     self.init(cDocument: document)
+  }
+
+  fileprivate class func parse(cChars: [CChar], size: Int, options: Int32) -> xmlDocPtr? {
+    return xmlReadMemory(UnsafePointer(cChars), Int32(size), "", nil, options)
   }
   
   fileprivate init(cDocument: xmlDocPtr) {
     self.cDocument = cDocument
-    // cDocument shall not be nil
-    root = XMLElement(cNode: xmlDocGetRootElement(cDocument), document: self)
+    if let cRoot = xmlDocGetRootElement(cDocument) {
+      root = XMLElement(cNode: cRoot, document: self)
+    }
   }
   
   deinit {
-    if cDocument != nil {
-      xmlFreeDoc(cDocument)
-    }
+    xmlFreeDoc(cDocument)
   }
   
   // MARK: - XML Namespaces
@@ -180,53 +182,8 @@ open class HTMLDocument: XMLDocument {
   open var body: XMLElement? {
     return root?.firstChild(tag: "body")
   }
-  
-  // MARK: - Creating HTML Documents
-  /**
-  Creates and returns an instance of HTMLDocument from an HTML string, throwing XMLError if an error occured while parsing the HTML.
-  
-  - parameter string:   The HTML string.
-  - parameter encoding: The string encoding.
-  
-  - throws: `XMLError` instance if an error occurred
-  
-  - returns: An `HTMLDocument` with the contents of the specified HTML string.
-  */
-  public convenience init(string: String, encoding: String.Encoding = String.Encoding.utf8) throws {
-    guard let cChars = string.cString(using: encoding) else {
-      throw XMLError.invalidData
-    }
-    try self.init(cChars: cChars)
-  }
-  
-  /**
-  Creates and returns an instance of HTMLDocument from HTML data, throwing XMLError if an error occured while parsing the HTML.
-  
-  - parameter data: The HTML data.
-  
-  - throws: `XMLError` instance if an error occurred
-  
-  - returns: An `HTMLDocument` with the contents of the specified HTML string.
-  */
-  public convenience init(data: Data) throws {
-    try self.init(cChars: [CChar](UnsafeBufferPointer(start: (data as NSData).bytes.bindMemory(to: CChar.self, capacity: data.count), count: data.count)))
-  }
-  
-  /**
-  Creates and returns an instance of HTMLDocument from C char array, throwing XMLError if an error occured while parsing the HTML.
-  
-  - parameter cChars: cChars The HTML data as C char array
-  
-  - throws: `XMLError` instance if an error occurred
-  
-  - returns: An `HTMLDocument` with the contents of the specified HTML string.
-  */
-  public convenience init(cChars: [CChar]) throws {
-    let options = Int32(HTML_PARSE_NOWARNING.rawValue | HTML_PARSE_NOERROR.rawValue | HTML_PARSE_RECOVER.rawValue)
-    try self.init(cChars: cChars, options: options)
-  }
-  
-  fileprivate convenience init(cChars: [CChar], options: Int32) throws {
-    try self.init(parseFunction: htmlReadMemory, cChars: cChars, options: options)
+
+  fileprivate override class func parse(cChars: [CChar], size: Int, options: Int32) -> xmlDocPtr? {
+    return htmlReadMemory(UnsafePointer(cChars), Int32(size), "", nil, options)
   }
 }

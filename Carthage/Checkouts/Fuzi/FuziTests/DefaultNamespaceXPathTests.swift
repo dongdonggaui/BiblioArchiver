@@ -26,9 +26,9 @@ class DefaultNamespaceXPathTests: XCTestCase {
   var document: XMLDocument!
   override func setUp() {
     super.setUp()
-    let filePath = NSBundle(forClass: DefaultNamespaceXPathTests.self).pathForResource("ocf", ofType: "xml")!
+    let filePath = Bundle(for: DefaultNamespaceXPathTests.self).path(forResource: "ocf", ofType: "xml")!
     do {
-      document = try XMLDocument(data: NSData(contentsOfFile: filePath)!)
+      document = try XMLDocument(data: Data(contentsOfFile: filePath)!)
     } catch {
       XCTAssertFalse(true, "Error should not be thrown")
     }

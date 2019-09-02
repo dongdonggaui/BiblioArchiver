@@ -23,93 +23,92 @@ import Foundation
 import libxml2
 
 /// An enumerable set of XML nodes
-open class NodeSet: Sequence {
-  /// Empty node set
-  open static let emptySet = XPathNodeSet(cXPath: nil, document: nil)
+open class NodeSet: Collection {
+  // Index type for `Indexable` protocol
+  public typealias Index = Int
+
+  // IndexDistance type for `Indexable` protocol
+  public typealias IndexDistance = Int
   
-  /// XMLElement Generator for SequenceType Protocol
-  public typealias Iterator = AnyIterator<XMLElement>
-  
-  /**
-  generate method for SequenceType Protocol
-  
-  - returns: generator
-  */
-  open func makeIterator() -> Iterator {
-    var index = 0
-    // TODO: change to AnyGenerator when swift 2.1 gets out of the way
-    return AnyIterator {
-      defer {
-        index += 1
-      }
-      if index < self.count {
-        return self[index]
-      }
-      return nil
+  fileprivate var cursor = 0
+  open func next() -> XMLElement? {
+    defer {
+      cursor += 1
     }
+    if cursor < self.count {
+      return self[cursor]
+    }
+    return nil
   }
 
   /// Number of nodes
   open fileprivate(set) lazy var count: Int = {
-    return self.cNodeSet != nil ?Int(self.cNodeSet!.pointee.nodeNr) :0
+    return Int(self.cNodeSet?.pointee.nodeNr ?? 0)
   }()
   
   /// First Element
   open var first: XMLElement? {
-    return self[startIndex]
+    return count > 0 ? self[startIndex] : nil
   }
 
   /// if nodeset is empty
   open var isEmpty: Bool {
     return (cNodeSet == nil) || (cNodeSet!.pointee.nodeNr == 0) || (cNodeSet!.pointee.nodeTab == nil)
   }
+
+  /// Start index
+  open var startIndex: Index {
+    return 0
+  }
+
+  /// End index
+  open var endIndex: Index {
+    return count
+  }
+
+  /**
+   Get the Nth node from set.
+
+   - parameter idx: node index
+
+   - returns: the idx'th node, nil if out of range
+  */
+  open subscript(_ idx: Index) -> XMLElement {
+    precondition(idx >= startIndex && idx < endIndex, "Index of out bound")
+    return XMLElement(cNode: (cNodeSet!.pointee.nodeTab[idx])!, document: document)
+  }
   
-  let cNodeSet: xmlNodeSetPtr?
-  let document: XMLDocument?
+  /**
+   Get the index after `idx`
+
+   - parameter idx: node index
+
+   - returns: the index after `idx`
+   */
+  open func index(after idx: Index) -> Index {
+    return idx + 1
+  }
   
-  init(cNodeSet: xmlNodeSetPtr, document: XMLDocument?) {
+  internal let cNodeSet: xmlNodeSetPtr?
+  internal let document: XMLDocument!
+  
+  internal init(cNodeSet: xmlNodeSetPtr?, document: XMLDocument?) {
     self.cNodeSet = cNodeSet
     self.document = document
   }
 }
 
-extension NodeSet: Indexable {
-  /// Use Int as Index type
-  public typealias Index = Int
-  
-  /// Start index
-  public var startIndex: Index {
-    return 0
-  }
-  
-  /// End index
-  public var endIndex: Index {
-    return count
-  }
-  
-  /**
-  Get the Nth node from set.
-  
-  - parameter idx: node index
-  
-  - returns: the idx'th node, nil if out of range
-  */
-  public subscript(idx: Index) -> XMLElement? {
-    if idx >= count {
-      return nil
-    }
-    return XMLElement(cNode: (cNodeSet?.pointee.nodeTab[idx]!)!, document: document!)
-  }
-}
-
 /// XPath selector result node set
 open class XPathNodeSet: NodeSet {
-  var cXPath: xmlXPathObjectPtr?
+  /// Empty node set
+  public static let emptySet = XPathNodeSet(cXPath: nil, document: nil)
+
+  fileprivate var cXPath: xmlXPathObjectPtr?
   
-  init(cXPath: xmlXPathObjectPtr?, document: XMLDocument?) {
+  internal init(cXPath: xmlXPathObjectPtr?, document: XMLDocument?) {
     self.cXPath = cXPath
-    let nodeSet = cXPath != nil ? cXPath?.pointee.nodesetval : nil
-    super.init(cNodeSet: nodeSet!, document: document)
+    let nodeSet = cXPath?.pointee.nodesetval
+    super.init(cNodeSet: nodeSet, document: document)
   }
   
   deinit {

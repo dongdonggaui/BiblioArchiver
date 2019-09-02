@@ -10,25 +10,25 @@ import Foundation
 import Fuzi
 
 /// Archive completion handler block
-public typealias ArchiveCompletionHandler = (webarchiveData: NSData?, metaData: [String: String?]?, error: ArchiveErrorType?) -> ()
+public typealias ArchiveCompletionHandler = (_ webarchiveData: Data?, _ metaData: [String: String?]?, _ error: ArchiveErrorType?) -> ()
 
 /// Fetch resource paths completion handler block
-public typealias FetchResourcePathCompletionHandler = (data: NSData?, metaData: [String: String?]?, resources: [String]?, error: ArchiveErrorType?) -> ()
+public typealias FetchResourcePathCompletionHandler = (_ data: Data?, _ metaData: [String: String?]?, _ resources: [String]?, _ error: ArchiveErrorType?) -> ()
 
 /// Error type
-public enum ArchiveErrorType: ErrorType {
-    case FetchHTMLError
-    case HTMLInvalid
-    case FailToInitHTMLDocument
-    case FetchResourceFailed
-    case PlistSerializeFailed
+public enum ArchiveErrorType: Error {
+    case fetchHTMLError
+    case htmlInvalid
+    case failToInitHTMLDocument
+    case fetchResourceFailed
+    case plistSerializeFailed
 }
 
 /// Meta data key 'title'
 public let ArchivedWebpageMetaKeyTitle = "title"
 
 /// Resource fetch options
-public struct ResourceFetchOptions: OptionSetType {
+public struct ResourceFetchOptions: OptionSet {
     /// rawValue
     public var rawValue: UInt
 
@@ -62,11 +62,11 @@ private let kWebResourceFrameName = "WebResourceFrameName"
 private let kWebMainResource = "WebMainResource"
 
 /// Archiver
-public class Archiver {
+open class Archiver {
     static let defaultFetchOptions: ResourceFetchOptions = [.FetchImage, .FetchJs, .FetchCss]
 
     /// flag for whether log or not
-    public static var logEnabled = false
+    open static var logEnabled = false
 
     /**
      Archive web page from url
@@ -74,58 +74,58 @@ public class Archiver {
      - parameter url: The destination url
      - parameter completionHandler: Called when the web page archived
      */
-    public static func archiveWebpageFormUrl(url: NSURL, completionHandler: ArchiveCompletionHandler) {
+    open static func archiveWebpageFormUrl(_ url: URL, completionHandler: @escaping ArchiveCompletionHandler) {
 
         self.resourcePathsFromUrl(url, fetchOptions: defaultFetchOptions) { (data, metaData, resources, error) in
             guard let resources = resources else {
                 printLog("resource fetch error : \(error)")
-                completionHandler(webarchiveData: nil, metaData: nil, error: .FetchResourceFailed)
+                completionHandler(nil, nil, .fetchResourceFailed)
                 return
             }
             
             let resourceInfo = NSMutableDictionary(capacity: resources.count)
 
-            let assembleQueue = dispatch_queue_create(kResourceAssembleQueue, nil)
-            let downloadGroup = dispatch_group_create()
-            let defaultGlobalQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+            let assembleQueue = DispatchQueue(label: kResourceAssembleQueue, attributes: [])
+            let downloadGroup = DispatchGroup()
+            let defaultGlobalQueue = DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default)
 
             for path in resources {
-                guard let resourceUrl = NSURL(string: path) else {
+                guard let resourceUrl = URL(string: path) else {
                     continue
                 }
-                dispatch_group_async(downloadGroup, defaultGlobalQueue, {
-                    let semapore = dispatch_semaphore_create(0)
-                    let task = NSURLSession.sharedSession().dataTaskWithURL(resourceUrl, completionHandler: { (data, response, error) in
+                defaultGlobalQueue.async(group: downloadGroup, execute: {
+                    let semapore = DispatchSemaphore(value: 0)
+                    let task = URLSession.shared.dataTask(with: resourceUrl, completionHandler: { (data, response, error) in
 
-                        guard let response = response as? NSHTTPURLResponse where response.statusCode == 200 else {
+                        guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
                             printLog("url : <\(path)> failed")
-                            dispatch_semaphore_signal(semapore)
+                            semapore.signal()
                             return
                         }
 
                         let resource = NSMutableDictionary(capacity: 3)
                         resource[kWebResourceUrl] = path
-                        if let mimeType = response.MIMEType {
+                        if let mimeType = response.mimeType {
                             resource[kWebResourceMIMEType] = mimeType
                         }
                         if let data = data {
                             resource[kWebResourceData] = data
                         }
 
-                        dispatch_sync(assembleQueue, {
+                        assembleQueue.sync(execute: {
                             resourceInfo[path] = resource
                         })
 
                         printLog("url : <\(path)> downloaded")
-                        dispatch_semaphore_signal(semapore)
+                        semapore.signal()
                     })
                     task.resume()
-                    dispatch_semaphore_wait(semapore, DISPATCH_TIME_FOREVER)
+                    semapore.wait(timeout: DispatchTime.distantFuture)
                     printLog("dispatch task : <\(path)> completed")
                 })
             }
 
-            dispatch_group_notify(downloadGroup, assembleQueue, {
+            downloadGroup.notify(queue: assembleQueue, execute: {
                 let webSubresources = resourceInfo.allValues
 
                 let mainResource = NSMutableDictionary(capacity: 5)
@@ -144,11 +144,11 @@ public class Archiver {
                 printLog("webarchive : \(webarchive.ba_description())")
 
                 do {
-                    let webarchiveData = try NSPropertyListSerialization.dataWithPropertyList(webarchive, format: .BinaryFormat_v1_0, options: 0)
-                    completionHandler(webarchiveData: webarchiveData, metaData: metaData, error: nil)
+                    let webarchiveData = try PropertyListSerialization.data(fromPropertyList: webarchive, format: .binary, options: 0)
+                    completionHandler(webarchiveData, metaData, nil)
                 } catch { error
                     printLog("plist serialize error : \(error)")
-                    completionHandler(webarchiveData: nil, metaData: metaData, error: .PlistSerializeFailed)
+                    completionHandler(nil, metaData, .plistSerializeFailed)
                 }
             })
         }
@@ -159,7 +159,7 @@ public class Archiver {
 
      - parameter url: Destination url
      */
-    public static func logHTMLResources(fromUrl url: NSURL) {
+    open static func logHTMLResources(fromUrl url: URL) {
 
         self.resourcePathsFromUrl(url, fetchOptions: [.FetchImage, .FetchJs, .FetchCss]) { (data, metaData, resources, error) in
             guard let resources = resources else {
@@ -178,26 +178,26 @@ public class Archiver {
      - parameter fetchOptions:      Fetch options
      - parameter completionHandler: Called when resources fetch finished
      */
-    public static func resourcePathsFromUrl(url: NSURL, fetchOptions: ResourceFetchOptions, completionHandler: FetchResourcePathCompletionHandler) {
+    open static func resourcePathsFromUrl(_ url: URL, fetchOptions: ResourceFetchOptions, completionHandler: @escaping FetchResourcePathCompletionHandler) {
 
-        let session = NSURLSession.sharedSession()
-        let task = session.dataTaskWithURL(url) { (data, response, error) in
+        let session = URLSession.shared
+        let task = session.dataTask(with: url, completionHandler: { (data, response, error) in
 
             guard let htmlData = data else {
                 printLog("fetch html error : \(error)")
-                completionHandler(data: data, metaData: nil, resources: nil, error: ArchiveErrorType.FetchHTMLError)
+                completionHandler(data, nil, nil, ArchiveErrorType.fetchHTMLError)
                 return
             }
 
-            guard let html = (NSString(data: htmlData, encoding: NSUTF8StringEncoding) as? String) else {
+            guard let html = (NSString(data: htmlData, encoding: String.Encoding.utf8.rawValue) as? String) else {
                 printLog("html invalid")
-                completionHandler(data: data, metaData: nil, resources: nil, error: ArchiveErrorType.HTMLInvalid)
+                completionHandler(data, nil, nil, ArchiveErrorType.htmlInvalid)
                 return
             }
 
-            guard let doc = try? HTMLDocument(string: html, encoding: NSUTF8StringEncoding) else {
+            guard let doc = try? HTMLDocument(string: html, encoding: String.Encoding.utf8) else {
                 printLog("init html doc error, html : \(html)")
-                completionHandler(data: data, metaData: nil, resources: nil, error: ArchiveErrorType.FailToInitHTMLDocument)
+                completionHandler(data, nil, nil, ArchiveErrorType.failToInitHTMLDocument)
                 return
             }
 
@@ -210,7 +210,7 @@ public class Archiver {
 
             var resources: [String] = []
 
-            let resoucePathFilter: (base: String?) -> String? = { base in
+            let resoucePathFilter: (_ base: String?) -> String? = { base in
                 guard let base = base else {
                     return nil
                 }
@@ -228,7 +228,7 @@ public class Archiver {
             if fetchOptions.contains(.FetchImage) {
                 let imagePaths = doc.xpath("//img[@src]").flatMap({ (node: XMLElement) -> String? in
 
-                    return resoucePathFilter(base: node["src"])
+                    return resoucePathFilter(node["src"])
                 })
                 resources += imagePaths
             }
@@ -237,7 +237,7 @@ public class Archiver {
             if fetchOptions.contains(.FetchJs) {
                 let jsPaths = doc.xpath("//script[@src]").flatMap({ node in
 
-                    return resoucePathFilter(base: node["src"])
+                    return resoucePathFilter(node["src"])
                 })
                 resources += jsPaths
             }
@@ -246,19 +246,19 @@ public class Archiver {
             if fetchOptions.contains(.FetchCss) {
                 let cssPaths = doc.xpath("//link[@rel='stylesheet'][@href]").flatMap({ node in
 
-                    return resoucePathFilter(base: node["href"])
+                    return resoucePathFilter(node["href"])
                 })
                 resources += cssPaths
             }
 
-            completionHandler(data: data, metaData: metaData, resources: resources, error: nil)
-        }
+            completionHandler(data, metaData, resources, nil)
+        }) 
         task.resume()
     }
 }
 
 extension Archiver {
-    static func printLog<T>(message: T, file: String = #file, method: String = #function, line: Int = #line) {
+    static func printLog<T>(_ message: T, file: String = #file, method: String = #function, line: Int = #line) {
         if self.logEnabled {
             print("\((file as NSString).lastPathComponent)[\(line)], \(method): \(message)")
         }
@@ -283,11 +283,11 @@ extension NSDictionary {
 
      - returns: Formatted output
      */
-    public func ba_description(depth: Int) -> String {
+    public func ba_description(_ depth: Int) -> String {
         let tabs = String.ba_tabsWithCount(depth)
         var description = "{\n"
         let contentTabs = depth == 0 ? "  " : "\(tabs)\(tabs)"
-        self.enumerateKeysAndObjectsUsingBlock { (key, obj, stop) in
+        self.enumerateKeysAndObjects({ (key, obj, stop) in
             var subdescription = obj
             if let obj = obj as? NSDictionary {
                 subdescription = obj.ba_description(depth + 1)
@@ -295,11 +295,11 @@ extension NSDictionary {
             if let obj = obj as? NSArray {
                 subdescription = obj.ba_description(depth + 1)
             }
-            if obj.isKindOfClass(NSData.self) {
+            if (obj as AnyObject).isKind(of: NSData.self) {
                 subdescription = "NSData"
             }
             description += "\(contentTabs)\(key): \(subdescription),\n"
-        }
+        })
         description += "\(tabs)}"
         return description
     }
@@ -323,11 +323,11 @@ extension NSArray {
 
      - returns: Formatted output
      */
-    public func ba_description(depth: Int) -> String {
+    public func ba_description(_ depth: Int) -> String {
         let tabs = String.ba_tabsWithCount(depth)
         var description = "[\n"
         let contentTabs = depth == 0 ? "  " : "\(tabs)\(tabs)"
-        self.enumerateObjectsUsingBlock { (obj, idx, stop) in
+        self.enumerateObjects({ (obj, idx, stop) in
             var subdescription = obj
             if let obj = obj as? NSDictionary {
                 subdescription = obj.ba_description(depth + 1)
@@ -335,11 +335,11 @@ extension NSArray {
             if let obj = obj as? NSArray {
                 subdescription = obj.ba_description(depth + 1)
             }
-            if obj.isKindOfClass(NSData.self) {
+            if (obj as AnyObject).isKind(of: NSData.self) {
                 subdescription = "NSData"
             }
             description += "\(contentTabs)\(subdescription),\n"
-        }
+        })
         description += "\(tabs)]"
 
         return description
@@ -354,7 +354,7 @@ extension String {
 
      - returns: Whitespaces with specific count
      */
-    public static func ba_tabsWithCount(count: Int) -> String {
+    public static func ba_tabsWithCount(_ count: Int) -> String {
         var tabs = ""
         var index = count
         while index > 0 {

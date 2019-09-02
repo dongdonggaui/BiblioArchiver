@@ -1,0 +1,6 @@
+framework module BiblioArchiver {
+  umbrella header "BiblioArchiver-umbrella.h"
+
+  export *
+  module * { export * }
+}

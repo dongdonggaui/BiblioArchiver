@@ -54,36 +54,36 @@ extension XMLDocument: CustomStringConvertible, CustomDebugStringConvertible {
 
 internal extension String {
   subscript (nsrange: NSRange) -> String {
-    let start = startIndex.advancedBy(nsrange.location)
-    let end = start.advancedBy(nsrange.length)
+    let start = characters.index(startIndex, offsetBy: nsrange.location)
+    let end = <#T##String.CharacterView corresponding to `start`##String.CharacterView#>.index(start, offsetBy: nsrange.length)
     return self[start..<end]
   }
 }
 
 // Just a smiling helper operator making frequent UnsafePointer -> String cast
 
-prefix operator ^-^ {}
+prefix operator ^-^
 internal prefix func ^-^ <T> (ptr: UnsafePointer<T>) -> String? {
-  return String.fromCString(UnsafePointer(ptr))
+  return String(cString: UnsafePointer(ptr))
 }
 
 internal prefix func ^-^ <T> (ptr: UnsafeMutablePointer<T>) -> String? {
-  return String.fromCString(UnsafeMutablePointer(ptr))
+  return String(cString: UnsafeMutablePointer(ptr))
 }
 
-internal struct LinkedCNodes: SequenceType {
-  typealias Generator = AnyGenerator<xmlNodePtr>
+internal struct LinkedCNodes: Sequence {
+  typealias Iterator = AnyIterator<xmlNodePtr>
   static let end: xmlNodePtr? = nil
   internal var types: [xmlElementType]
-  func generate() -> Generator {
+  func makeIterator() -> Iterator {
     var node = head
     // TODO: change to AnyGenerator when swift 2.1 gets out of the way
-    return anyGenerator {
+    return AnyIterator {
       var ret = node
-      while ret != nil && !self.types.contains({ $0 == ret.memory.type }) {
-        ret = ret.memory.next
+      while ret != nil && !self.types.contains(where: { $0 == ret.pointee.type }) {
+        ret = ret.pointee.next
       }
-      node = ret != nil ?ret.memory.next :nil
+      node = (ret != nil ?ret.pointee.next :nil)!
       return ret != nil ?ret :LinkedCNodes.end
     }
   }
@@ -95,15 +95,15 @@ internal struct LinkedCNodes: SequenceType {
   }
 }
 
-internal func cXMLNodeMatchesTagInNamespace(node: xmlNodePtr, tag: String, ns: String?) -> Bool {
-  let name = ^-^node.memory.name
-  var matches = name?.compare(tag, options: .CaseInsensitiveSearch) == .OrderedSame
+internal func cXMLNodeMatchesTagInNamespace(_ node: xmlNodePtr, tag: String, ns: String?) -> Bool {
+  let name = ^-^node.pointee.name
+  var matches = name?.compare(tag, options: .caseInsensitive) == .orderedSame
   
   if let ns = ns {
-    let cNS = node.memory.ns
-    if cNS != nil && cNS.memory.prefix != nil {
-      let prefix = ^-^cNS.memory.prefix
-      matches = matches && (prefix?.compare(ns, options: .CaseInsensitiveSearch) == .OrderedSame)
+    let cNS = node.pointee.ns
+    if cNS != nil && cNS?.pointee.prefix != nil {
+      let prefix = ^-^cNS?.pointee.prefix
+      matches = matches && (prefix?.compare(ns, options: .caseInsensitive) == .orderedSame)
     }
   }
   return matches

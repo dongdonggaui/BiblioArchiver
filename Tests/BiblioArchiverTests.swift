@@ -12,14 +12,14 @@ import Mockingjay
 
 class BiblioArchiverTests: XCTestCase {
     
-    let url = NSURL(string: "https://100.com/test.html")!
+    let url = URL(string: "https://100.com/test.html")!
     
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        let path = NSBundle(forClass: self.dynamicType).pathForResource("test", ofType: "html")!
-        let data = NSData(contentsOfFile: path)
-        stub(http(.GET, uri: "https://100.com/test.html"), builder: http(200, headers: nil, data: data))
+        let path = Bundle(for: type(of: self)).path(forResource: "test", ofType: "html")!
+        let data = try? Data(contentsOf: URL(fileURLWithPath: path))
+        stub(http(.get, uri: "https://100.com/test.html"), builder: http(200, headers: nil, data: data))
     }
     
     override func tearDown() {
@@ -28,9 +28,9 @@ class BiblioArchiverTests: XCTestCase {
     }
     
     func testHTMLParse() {
-        let exceptation = expectationWithDescription("Wait for downloading html")
+        let exceptation = expectation(description: "Wait for downloading html")
         
-        Archiver.resourcePathsFromUrl(NSURL(string: "https://100.com/test.html")!, fetchOptions: [.FetchImage, .FetchCss, .FetchJs]) { (data, metaData, resources, error) in
+        Archiver.resourcePathsFromUrl(URL(string: "https://100.com/test.html")!, fetchOptions: [.FetchImage, .FetchCss, .FetchJs]) { (data, metaData, resources, error) in
             
             guard let resources = resources else {
                 XCTAssert(false, "Resources parse result should not be nil")
@@ -58,11 +58,11 @@ class BiblioArchiverTests: XCTestCase {
             exceptation.fulfill()
         }
         
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
     }
     
     func testMetaDataTitle() {
-        let expectation = expectationWithDescription("wait for downloading html")
+        let expectation = self.expectation(description: "wait for downloading html")
         
         Archiver.resourcePathsFromUrl(url, fetchOptions: Archiver.defaultFetchOptions) { (data, metaData, resources, error) in
             let title = "This is a test"
@@ -70,6 +70,6 @@ class BiblioArchiverTests: XCTestCase {
             
             expectation.fulfill()
         }
-        waitForExpectationsWithTimeout(5, handler: nil)
+        waitForExpectations(timeout: 5, handler: nil)
     }
 }

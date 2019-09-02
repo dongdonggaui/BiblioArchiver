@@ -27,7 +27,7 @@ open class XMLElement: XMLNode {
   
   /// The element's namespace.
   open fileprivate(set) lazy var namespace: String? = {
-    return ^-^((self.cNode.pointee.ns != nil ?self.cNode.pointee.ns.pointee.prefix :nil)!)
+    return ^-^(self.cNode.pointee.ns != nil ?self.cNode.pointee.ns.pointee.prefix :nil)
   }()
   
   /// The element's tag.
@@ -67,7 +67,7 @@ open class XMLElement: XMLNode {
       xmlValue = xmlGetProp(cNode, name)
     }
     
-    if xmlValue != nil {
+    if let xmlValue = xmlValue {
       value = ^-^xmlValue
       xmlFree(xmlValue)
     }
@@ -78,7 +78,7 @@ open class XMLElement: XMLNode {
   
   /// The element's children elements.
   open var children: [XMLElement] {
-    return LinkedCNodes(head: cNode.pointee.children).flatMap {
+    return LinkedCNodes(head: cNode.pointee.children).compactMap {
       XMLElement(cNode: $0, document: self.document)
     }
   }
@@ -91,12 +91,12 @@ open class XMLElement: XMLNode {
   - returns: all children of specified types
   */
   open func childNodes(ofTypes types: [XMLNodeType]) -> [XMLNode] {
-    return LinkedCNodes(head: cNode.pointee.children, types: types).flatMap { node in
+    return LinkedCNodes(head: cNode.pointee.children, types: types).compactMap { node in
       switch node.pointee.type {
       case XMLNodeType.Element:
         return XMLElement(cNode: node, document: self.document)
       default:
-        return XMLNode(cNode: node, document: self.document, type: node.pointee.type)
+        return XMLNode(cNode: node, document: self.document)
       }
     }
   }
@@ -109,32 +109,42 @@ open class XMLElement: XMLNode {
   
   - returns: The child element.
   */
-  open func firstChild(tag: String, inNamespace ns: String? = nil) -> XMLElement? {
+  open func firstChild(tag: XMLCharsComparable, inNamespace ns: XMLCharsComparable? = nil) -> XMLElement? {
     var nodePtr = cNode.pointee.children
-    while nodePtr != nil {
-      if cXMLNodeMatchesTagInNamespace(nodePtr, tag: tag, ns: ns) {
-        return XMLElement(cNode: nodePtr!, document: self.document)
+    while let cNode = nodePtr {
+      if cXMLNode(nodePtr, matchesTag: tag, inNamespace: ns) {
+        return XMLElement(cNode: cNode, document: self.document)
       }
-      nodePtr = nodePtr?.pointee.next
+      nodePtr = cNode.pointee.next
     }
     return nil
   }
-  
+
+  /// faster version of firstChild with string literals (explicitly typed as StaticString)
+  open func firstChild(staticTag tag: StaticString, inNamespace ns: StaticString? = nil) -> XMLElement? {
+    return firstChild(tag: tag, inNamespace: ns)
+  }
+
   /**
   Returns all children elements with the specified tag.
-  
+
   - parameter tag: The tag name.
   - parameter ns:  The namepsace, or `nil` by default if not using a namespace
-  
+
   - returns: The children elements.
   */
-  open func children(tag: String, inNamespace ns: String? = nil) -> [XMLElement] {
-    return LinkedCNodes(head: cNode.pointee.children).flatMap {
-      cXMLNodeMatchesTagInNamespace($0, tag: tag, ns: ns)
+  open func children(tag: XMLCharsComparable, inNamespace ns: XMLCharsComparable? = nil) -> [XMLElement] {
+    return LinkedCNodes(head: cNode.pointee.children).compactMap {
+      cXMLNode($0, matchesTag: tag, inNamespace: ns)
         ? XMLElement(cNode: $0, document: self.document) : nil
     }
   }
-  
+
+  /// faster version of children with string literals (explicitly typed as StaticString)
+  open func children(staticTag tag: StaticString, inNamespace ns: StaticString? = nil) -> [XMLElement] {
+    return children(tag: tag, inNamespace: ns)
+  }
+
   // MARK: - Accessing Content
   /// Whether the element has a value.
   open var isBlank: Bool {
@@ -171,9 +181,5 @@ open class XMLElement: XMLNode {
   */
   open subscript (name: String) -> String? {
     return attr(name)
-  }
-  
-  internal init?(cNode: xmlNodePtr, document: XMLDocument) {
-    super.init(cNode: cNode, document: document, type: .Element)
   }
 }

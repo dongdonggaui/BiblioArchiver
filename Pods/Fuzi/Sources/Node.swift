@@ -88,10 +88,12 @@ public func ~=(lhs: XMLNodeType, rhs: XMLNodeType) -> Bool {
 /// Base class for all XML nodes
 open class XMLNode {
   /// The document containing the element.
-  open unowned let document: XMLDocument
+  public unowned let document: XMLDocument
   
   /// The type of the XMLNode
-  open var type: XMLNodeType
+  open var type: XMLNodeType {
+    return cNode.pointee.type
+  }
   
   /// The element's line number.
   open fileprivate(set) lazy var lineNumber: Int = {
@@ -104,17 +106,22 @@ open class XMLNode {
     return XMLElement(cNode: self.cNode.pointee.parent, document: self.document)
   }()
   
-  /// The element's next sibling.
+  /// The element's previous sibling.
   open fileprivate(set) lazy var previousSibling: XMLElement? = {
     return XMLElement(cNode: self.cNode.pointee.prev, document: self.document)
   }()
-  
-  /// The element's previous sibling.
+
+  /// The element's next sibling.
   open fileprivate(set) lazy var nextSibling: XMLElement? = {
     return XMLElement(cNode: self.cNode.pointee.next, document: self.document)
   }()
   
   // MARK: - Accessing Contents
+  /// Whether this is a HTML node
+  open var isHTML: Bool {
+    return UInt32(self.cNode.pointee.doc.pointee.properties) & XML_DOC_HTML.rawValue == XML_DOC_HTML.rawValue
+  }
+
   /// A string representation of the element's value.
   open fileprivate(set) lazy var stringValue : String = {
     let key = xmlNodeGetContent(self.cNode)
@@ -126,7 +133,11 @@ open class XMLNode {
   /// The raw XML string of the element.
   open fileprivate(set) lazy var rawXML: String = {
     let buffer = xmlBufferCreate()
-    xmlNodeDump(buffer, self.cNode.pointee.doc, self.cNode, 0, 0)
+    if self.isHTML {
+      htmlNodeDump(buffer, self.cNode.pointee.doc, self.cNode)
+    } else {
+      xmlNodeDump(buffer, self.cNode.pointee.doc, self.cNode, 0, 0)
+    }
     let dumped = ^-^xmlBufferContent(buffer) ?? ""
     xmlBufferFree(buffer)
     return dumped
@@ -139,13 +150,16 @@ open class XMLNode {
   
   internal let cNode: xmlNodePtr
   
-  internal init?(cNode: xmlNodePtr?, document: XMLDocument, type: XMLNodeType) {
-    self.cNode = cNode!
-    self.type = type
+  internal init(cNode: xmlNodePtr, document: XMLDocument) {
+    self.cNode = cNode
     self.document = document
-    if cNode == nil {
+  }
+
+  internal convenience init?(cNode: xmlNodePtr?, document: XMLDocument) {
+    guard let cNode = cNode else {
       return nil
     }
+    self.init(cNode: cNode, document: document)
   }
 }
 

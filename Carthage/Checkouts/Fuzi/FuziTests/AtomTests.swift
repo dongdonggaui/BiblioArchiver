@@ -26,9 +26,9 @@ class AtomTests: XCTestCase {
   var document: XMLDocument!
   override func setUp() {
     super.setUp()
-    let filePath = NSBundle(forClass: AtomTests.self).pathForResource("atom", ofType: "xml")!
+    let filePath = Bundle(for: AtomTests.self).path(forResource: "atom", ofType: "xml")!
     do {
-      document = try XMLDocument(data: NSData(contentsOfFile: filePath)!)
+      document = try XMLDocument(data: Data(contentsOfFile: filePath)!)
     } catch {
       XCTAssertFalse(true, "Error should not be thrown")
     }
@@ -40,7 +40,7 @@ class AtomTests: XCTestCase {
   }
   
   func testXMLEncoding() {
-    XCTAssertEqual(document.encoding, NSUTF8StringEncoding, "XML encoding should be UTF-8")
+    XCTAssertEqual(document.encoding, String.Encoding.utf8, "XML encoding should be UTF-8")
   }
   
   func testRoot() {
@@ -71,15 +71,15 @@ class AtomTests: XCTestCase {
   func testUpdated() {
     let updatedElement = document.root!.firstChild(tag: "updated")
     XCTAssertNotNil(updatedElement?.dateValue, "dateValue should not be nil")
-    let dateComponents = NSDateComponents()
-    dateComponents.timeZone = NSTimeZone(abbreviation: "UTC")
+    var dateComponents = DateComponents()
+    (dateComponents as NSDateComponents).timeZone = TimeZone(abbreviation: "UTC")
     dateComponents.year = 2003
     dateComponents.month = 12
     dateComponents.day = 13
     dateComponents.hour = 18
     dateComponents.minute = 30
     dateComponents.second = 2
-    XCTAssertEqual(updatedElement?.dateValue, NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)?.dateFromComponents(dateComponents), "dateValue should be equal to December 13, 2003 6:30:02 PM")
+    XCTAssertEqual(updatedElement?.dateValue, Calendar(calendarIdentifier: Calendar.Identifier.gregorian)?.dateFromComponents(dateComponents), "dateValue should be equal to December 13, 2003 6:30:02 PM")
   }
   
   func testEntries() {

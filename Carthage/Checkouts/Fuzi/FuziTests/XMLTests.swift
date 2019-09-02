@@ -26,9 +26,9 @@ class XMLTests: XCTestCase {
   var document: XMLDocument!
   override func setUp() {
     super.setUp()
-    let filePath = NSBundle(forClass: XMLTests.self).pathForResource("xml", ofType: "xml")!
+    let filePath = Bundle(for: XMLTests.self).path(forResource: "xml", ofType: "xml")!
     do {
-      document = try XMLDocument(data: NSData(contentsOfFile: filePath)!)
+      document = try XMLDocument(data: Data(contentsOfFile: filePath)!)
     } catch {
       XCTAssertFalse(true, "Error should not be thrown")
     }
@@ -39,7 +39,7 @@ class XMLTests: XCTestCase {
   }
   
   func testXMLEncoding() {
-    XCTAssertEqual(document.encoding, NSUTF8StringEncoding, "XML encoding should be UTF-8")
+    XCTAssertEqual(document.encoding, String.Encoding.utf8, "XML encoding should be UTF-8")
   }
   
   func testRoot() {

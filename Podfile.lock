@@ -1,20 +1,23 @@
 PODS:
-  - Mockingjay (1.2.1):
-    - Mockingjay/Core (= 1.2.1)
-    - Mockingjay/XCTest (= 1.2.1)
-  - Mockingjay/Core (1.2.1):
-    - URITemplate (~> 1.3)
-  - Mockingjay/XCTest (1.2.1):
-    - Mockingjay/Core
-  - URITemplate (1.3.1)
+  - BiblioArchiver (0.0.1):
+    - Fuzi (= 2.2.1)
+  - Fuzi (2.2.1)
 
 DEPENDENCIES:
-  - Mockingjay (~> 1.2.1)
+  - BiblioArchiver (from `./`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Fuzi
+
+EXTERNAL SOURCES:
+  BiblioArchiver:
+    :path: "./"
 
 SPEC CHECKSUMS:
-  Mockingjay: cc4249c2ed9b21fbc9adabf6329d7473212b4251
-  URITemplate: 398a48d6559e23b77bd41176b675b017ad1fc959
+  BiblioArchiver: f40d731e4157834b5e9ee0cbcc64a9104f1857c2
+  Fuzi: 3e6c73359d84a92376763abbaf8ced4d49c0f4ea
 
-PODFILE CHECKSUM: 296a03e07d3bf129dc74a885f495b905c63e9558
+PODFILE CHECKSUM: 196af130e99b683f4c7ce06a05689c521b6381f7
 
-COCOAPODS: 1.0.0
+COCOAPODS: 1.7.3

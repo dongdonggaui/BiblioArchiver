@@ -26,9 +26,9 @@ class VMAPTests: XCTestCase {
   var document: XMLDocument!
   override func setUp() {
     super.setUp()
-    let filePath = NSBundle(forClass: VMAPTests.self).pathForResource("vmap", ofType: "xml")!
+    let filePath = Bundle(for: VMAPTests.self).path(forResource: "vmap", ofType: "xml")!
     do {
-      document = try XMLDocument(data: NSData(contentsOfFile: filePath)!)
+      document = try XMLDocument(data: Data(contentsOfFile: filePath)!)
     } catch {
       XCTAssertFalse(true, "Error should not be thrown")
     }
