@@ -78,7 +78,7 @@ open class Archiver {
 
         self.resourcePathsFromUrl(url, fetchOptions: defaultFetchOptions) { (data, metaData, resources, error) in
             guard let resources = resources else {
-                printLog("resource fetch error : \(error)")
+                printLog("resource fetch error : \(error?.localizedDescription)")
                 completionHandler(nil, nil, .fetchResourceFailed)
                 return
             }
@@ -87,7 +87,7 @@ open class Archiver {
 
             let assembleQueue = DispatchQueue(label: kResourceAssembleQueue, attributes: [])
             let downloadGroup = DispatchGroup()
-            let defaultGlobalQueue = DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default)
+            let defaultGlobalQueue = DispatchQueue.global(qos: .default)
 
             for path in resources {
                 guard let resourceUrl = URL(string: path) else {
@@ -120,7 +120,7 @@ open class Archiver {
                         semapore.signal()
                     })
                     task.resume()
-                    semapore.wait(timeout: DispatchTime.distantFuture)
+                    let _ = semapore.wait(timeout: DispatchTime.distantFuture)
                     printLog("dispatch task : <\(path)> completed")
                 })
             }
@@ -146,7 +146,7 @@ open class Archiver {
                 do {
                     let webarchiveData = try PropertyListSerialization.data(fromPropertyList: webarchive, format: .binary, options: 0)
                     completionHandler(webarchiveData, metaData, nil)
-                } catch { error
+                } catch let error {
                     printLog("plist serialize error : \(error)")
                     completionHandler(nil, metaData, .plistSerializeFailed)
                 }

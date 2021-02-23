@@ -10,7 +10,6 @@
 		098E348D1CF2AEA900750953 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098E348C1CF2AEA900750953 /* AppDelegate.swift */; };
 		098E34921CF2AEA900750953 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 098E34901CF2AEA900750953 /* Main.storyboard */; };
 		098E34941CF2AEA900750953 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 098E34931CF2AEA900750953 /* Assets.xcassets */; };
-		098E34971CF2AEA900750953 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 098E34951CF2AEA900750953 /* LaunchScreen.storyboard */; };
 		098E34A01CF2AECF00750953 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098E349E1CF2AECF00750953 /* ViewController.swift */; };
 		098E34A11CF2AECF00750953 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098E349F1CF2AECF00750953 /* WebViewController.swift */; };
 		6A93A4BCD2C26E242589618A /* Pods_BiblioArchiverDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99FED0ACE3C62B1117880243 /* Pods_BiblioArchiverDemo.framework */; };
@@ -34,7 +33,6 @@
 		098E348C1CF2AEA900750953 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		098E34911CF2AEA900750953 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		098E34931CF2AEA900750953 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		098E34961CF2AEA900750953 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		098E34981CF2AEA900750953 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		098E349E1CF2AECF00750953 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		098E349F1CF2AECF00750953 /* WebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
@@ -83,7 +81,6 @@
 				098E349F1CF2AECF00750953 /* WebViewController.swift */,
 				098E34901CF2AEA900750953 /* Main.storyboard */,
 				098E34931CF2AEA900750953 /* Assets.xcassets */,
-				098E34951CF2AEA900750953 /* LaunchScreen.storyboard */,
 				098E34981CF2AEA900750953 /* Info.plist */,
 			);
 			path = BiblioArchiverDemo;
@@ -154,6 +151,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -172,7 +170,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				098E34971CF2AEA900750953 /* LaunchScreen.storyboard in Resources */,
 				098E34941CF2AEA900750953 /* Assets.xcassets in Resources */,
 				098E34921CF2AEA900750953 /* Main.storyboard in Resources */,
 			);
@@ -241,14 +238,6 @@
 				098E34911CF2AEA900750953 /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		098E34951CF2AEA900750953 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				098E34961CF2AEA900750953 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -344,11 +333,13 @@
 			baseConfigurationReference = 9C3E16685954329846543E64 /* Pods-BiblioArchiverDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 34UL9Z437G;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = BiblioArchiverDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hly.BiblioArchiverDemo;
@@ -363,11 +354,13 @@
 			baseConfigurationReference = 3537AB592AA7B1F869560AC2 /* Pods-BiblioArchiverDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = BiblioArchiverDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hly.BiblioArchiverDemo;

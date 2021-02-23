@@ -18,7 +18,8 @@ class WebViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let path = webarchivePath, let url = URL(string: path) {
+        if let path = webarchivePath {
+            let url = URL(fileURLWithPath: path)
             self.webView.loadRequest(URLRequest(url: url))
         }
         else {

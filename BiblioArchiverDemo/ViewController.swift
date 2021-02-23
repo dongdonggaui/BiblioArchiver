@@ -27,7 +27,7 @@ struct FileHelper {
         }
     }
 
-    static let testWebarchiveFile = "onevcat.webarchive"
+    static let testWebarchiveFile = "obcj.webarchive"
 }
 
 class ViewController: UIViewController {
@@ -35,24 +35,28 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
-        let url = URL(string: "https://onevcat.com/2016/01/create-framework/")!
-        Archiver.logEnabled = true
-        Archiver.archiveWebpageFormUrl(url) { (webarchiveData, metaData, error) in
-            guard let data = webarchiveData as? NSData else {
-                print("no data, error : \(error)")
-                return
-            }
-            
-            let webarchiveDirectory = FileHelper.webarchiveDirectory
-            let webarchivePath = "\(webarchiveDirectory)/\(FileHelper.testWebarchiveFile)"
-            if data.write(toFile: webarchivePath, atomically: true) {
-                DispatchQueue.main.async(execute: {
-                    self.performSegue(withIdentifier: "showWeb", sender: webarchivePath)
-                })
-            }
-            else {
-                print("failed to write file to disk")
+        let webarchiveDirectory = FileHelper.webarchiveDirectory
+        let webarchivePath = "\(webarchiveDirectory)\(FileHelper.testWebarchiveFile)"
+        if FileManager.default.fileExists(atPath: webarchivePath) {
+            self.performSegue(withIdentifier: "showWeb", sender: webarchivePath)
+        }
+        else {
+            let url = URL(string: "https://knightsj.github.io/2017/04/10/《OC高级编程》干货三部曲（一）：引用计数篇/".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
+            Archiver.logEnabled = true
+            Archiver.archiveWebpageFormUrl(url) { (webarchiveData, metaData, error) in
+                guard let data = webarchiveData as? NSData else {
+                    print("no data, error : \(error)")
+                    return
+                }
+                
+                if data.write(toFile: webarchivePath, atomically: true) {
+                    DispatchQueue.main.async(execute: {
+                        self.performSegue(withIdentifier: "showWeb", sender: webarchivePath)
+                    })
+                }
+                else {
+                    print("failed to write file to disk")
+                }
             }
         }
     }
