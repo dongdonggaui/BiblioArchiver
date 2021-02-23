@@ -53,10 +53,10 @@ Pod::Spec.new do |spec|
   #  profile URL.
   #
 
-  spec.author             = { "iOS持续集成机器人" => "ios_support@douyu.tv" }
-  # Or just: spec.author    = "iOS持续集成机器人"
-  # spec.authors            = { "iOS持续集成机器人" => "ios_support@douyu.tv" }
-  # spec.social_media_url   = "https://twitter.com/iOS持续集成机器人"
+  spec.author             = { "hly" => "luke@huangluyang.com" }
+  # Or just: spec.author    = "hly"
+  # spec.authors            = { "hly" => "luke@huangluyang.com" }
+  # spec.social_media_url   = "https://twitter.com/hly"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
