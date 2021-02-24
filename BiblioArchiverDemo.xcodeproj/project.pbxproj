@@ -9,10 +9,11 @@
 /* Begin PBXBuildFile section */
 		098E348D1CF2AEA900750953 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098E348C1CF2AEA900750953 /* AppDelegate.swift */; };
 		098E34921CF2AEA900750953 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 098E34901CF2AEA900750953 /* Main.storyboard */; };
-		098E34941CF2AEA900750953 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 098E34931CF2AEA900750953 /* Assets.xcassets */; };
 		098E34A01CF2AECF00750953 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098E349E1CF2AECF00750953 /* ViewController.swift */; };
 		098E34A11CF2AECF00750953 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098E349F1CF2AECF00750953 /* WebViewController.swift */; };
 		6A93A4BCD2C26E242589618A /* Pods_BiblioArchiverDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99FED0ACE3C62B1117880243 /* Pods_BiblioArchiverDemo.framework */; };
+		DF30A35925E660A6009E7920 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DF30A35825E660A6009E7920 /* Launch Screen.storyboard */; };
+		DF30A36325E668AB009E7920 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 098E34931CF2AEA900750953 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -41,6 +42,8 @@
 		3537AB592AA7B1F869560AC2 /* Pods-BiblioArchiverDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiblioArchiverDemo.release.xcconfig"; path = "Target Support Files/Pods-BiblioArchiverDemo/Pods-BiblioArchiverDemo.release.xcconfig"; sourceTree = "<group>"; };
 		99FED0ACE3C62B1117880243 /* Pods_BiblioArchiverDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BiblioArchiverDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C3E16685954329846543E64 /* Pods-BiblioArchiverDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiblioArchiverDemo.debug.xcconfig"; path = "Target Support Files/Pods-BiblioArchiverDemo/Pods-BiblioArchiverDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		DF30A35825E660A6009E7920 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		DF30A35E25E6612C009E7920 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +85,7 @@
 				098E34901CF2AEA900750953 /* Main.storyboard */,
 				098E34931CF2AEA900750953 /* Assets.xcassets */,
 				098E34981CF2AEA900750953 /* Info.plist */,
+				DF30A35825E660A6009E7920 /* Launch Screen.storyboard */,
 			);
 			path = BiblioArchiverDemo;
 			sourceTree = "<group>";
@@ -135,23 +139,22 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = huangluyang;
 				TargetAttributes = {
 					098E34881CF2AEA900750953 = {
 						CreatedOnToolsVersion = 7.3;
 						DevelopmentTeam = 34UL9Z437G;
-						LastSwiftMigration = 0830;
+						LastSwiftMigration = 1240;
 						ProvisioningStyle = Manual;
 					};
 				};
 			};
 			buildConfigurationList = 098E34841CF2AEA900750953 /* Build configuration list for PBXProject "BiblioArchiverDemo" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 			);
@@ -170,7 +173,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				098E34941CF2AEA900750953 /* Assets.xcassets in Resources */,
+				DF30A36325E668AB009E7920 /* Assets.xcassets in Resources */,
+				DF30A35925E660A6009E7920 /* Launch Screen.storyboard in Resources */,
 				098E34921CF2AEA900750953 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -236,6 +240,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				098E34911CF2AEA900750953 /* Base */,
+				DF30A35E25E6612C009E7920 /* en */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -247,18 +252,30 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -280,7 +297,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -293,18 +310,30 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -320,9 +349,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -333,19 +363,19 @@
 			baseConfigurationReference = 9C3E16685954329846543E64 /* Pods-BiblioArchiverDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 34UL9Z437G;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = BiblioArchiverDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hly.BiblioArchiverDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "match Development *";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -354,19 +384,19 @@
 			baseConfigurationReference = 3537AB592AA7B1F869560AC2 /* Pods-BiblioArchiverDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = BiblioArchiverDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hly.BiblioArchiverDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

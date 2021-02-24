@@ -17,6 +17,7 @@ public typealias FetchResourcePathCompletionHandler = (_ data: Data?, _ metaData
 
 /// Error type
 public enum ArchiveErrorType: Error {
+    case urlInvalid
     case fetchHTMLError
     case htmlInvalid
     case failToInitHTMLDocument
@@ -62,11 +63,11 @@ private let kWebResourceFrameName = "WebResourceFrameName"
 private let kWebMainResource = "WebMainResource"
 
 /// Archiver
-open class Archiver {
+public class Archiver {
     static let defaultFetchOptions: ResourceFetchOptions = [.FetchImage, .FetchJs, .FetchCss]
 
     /// flag for whether log or not
-    open static var logEnabled = false
+    public static var logEnabled = false
 
     /**
      Archive web page from url
@@ -74,11 +75,11 @@ open class Archiver {
      - parameter url: The destination url
      - parameter completionHandler: Called when the web page archived
      */
-    open static func archiveWebpageFormUrl(_ url: URL, completionHandler: @escaping ArchiveCompletionHandler) {
+    public static func archiveWebpageFormUrl(_ url: URL, completionHandler: @escaping ArchiveCompletionHandler) {
 
         self.resourcePathsFromUrl(url, fetchOptions: defaultFetchOptions) { (data, metaData, resources, error) in
             guard let resources = resources else {
-                printLog("resource fetch error : \(error?.localizedDescription)")
+                printLog("resource fetch error : \(error?.localizedDescription ?? "")")
                 completionHandler(nil, nil, .fetchResourceFailed)
                 return
             }
@@ -159,11 +160,11 @@ open class Archiver {
 
      - parameter url: Destination url
      */
-    open static func logHTMLResources(fromUrl url: URL) {
+    public static func logHTMLResources(fromUrl url: URL) {
 
         self.resourcePathsFromUrl(url, fetchOptions: [.FetchImage, .FetchJs, .FetchCss]) { (data, metaData, resources, error) in
             guard let resources = resources else {
-                printLog("resource fetch error : \(error)")
+                printLog("resource fetch error : \(error?.localizedDescription ?? "")")
                 return
             }
 
@@ -178,18 +179,23 @@ open class Archiver {
      - parameter fetchOptions:      Fetch options
      - parameter completionHandler: Called when resources fetch finished
      */
-    open static func resourcePathsFromUrl(_ url: URL, fetchOptions: ResourceFetchOptions, completionHandler: @escaping FetchResourcePathCompletionHandler) {
+    public static func resourcePathsFromUrl(_ url: URL, fetchOptions: ResourceFetchOptions, completionHandler: @escaping FetchResourcePathCompletionHandler) {
+        guard let scheme = url.scheme else {
+            printLog("url invalid!")
+            completionHandler(nil, nil, nil, ArchiveErrorType.urlInvalid)
+            return
+        }
 
         let session = URLSession.shared
         let task = session.dataTask(with: url, completionHandler: { (data, response, error) in
 
             guard let htmlData = data else {
-                printLog("fetch html error : \(error)")
+                printLog("fetch html error : \(error?.localizedDescription ?? "")")
                 completionHandler(data, nil, nil, ArchiveErrorType.fetchHTMLError)
                 return
             }
 
-            guard let html = (NSString(data: htmlData, encoding: String.Encoding.utf8.rawValue) as? String) else {
+            guard let html = String(data: htmlData, encoding: .utf8) else {
                 printLog("html invalid")
                 completionHandler(data, nil, nil, ArchiveErrorType.htmlInvalid)
                 return
@@ -219,14 +225,14 @@ open class Archiver {
                 } else if base.hasPrefix("//") {
                     return "https:\(base)"
                 } else if base.hasPrefix("/"), let host = url.host {
-                    return "\(url.scheme)://\(host)\(base)"
+                    return "\(scheme)://\(host)\(base)"
                 }
                 return nil
             }
 
             // images
             if fetchOptions.contains(.FetchImage) {
-                let imagePaths = doc.xpath("//img[@src]").flatMap({ (node: XMLElement) -> String? in
+                let imagePaths = doc.xpath("//img[@src]").compactMap({ (node: XMLElement) -> String? in
 
                     return resoucePathFilter(node["src"])
                 })
@@ -235,7 +241,7 @@ open class Archiver {
 
             // js
             if fetchOptions.contains(.FetchJs) {
-                let jsPaths = doc.xpath("//script[@src]").flatMap({ node in
+                let jsPaths = doc.xpath("//script[@src]").compactMap({ node in
 
                     return resoucePathFilter(node["src"])
                 })
@@ -244,7 +250,7 @@ open class Archiver {
 
             // css
             if fetchOptions.contains(.FetchCss) {
-                let cssPaths = doc.xpath("//link[@rel='stylesheet'][@href]").flatMap({ node in
+                let cssPaths = doc.xpath("//link[@rel='stylesheet'][@href]").compactMap({ node in
 
                     return resoucePathFilter(node["href"])
                 })

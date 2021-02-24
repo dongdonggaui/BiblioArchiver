@@ -7,10 +7,11 @@
 //
 
 import UIKit
+import WebKit
 
 class WebViewController: UIViewController {
 
-    @IBOutlet weak var webView: UIWebView!
+    @IBOutlet weak var webView: WKWebView!
     
     var webarchivePath: String?
     
@@ -20,10 +21,10 @@ class WebViewController: UIViewController {
         
         if let path = webarchivePath {
             let url = URL(fileURLWithPath: path)
-            self.webView.loadRequest(URLRequest(url: url))
+            self.webView.load(URLRequest(url: url))
         }
         else {
-            print("webarchive path : \(webarchivePath) invalid")
+            print("webarchive path invalid")
         }
     }
 

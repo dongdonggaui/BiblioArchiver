@@ -19,7 +19,7 @@ struct FileHelper {
                 do {
                     try fileManager.createDirectory(atPath: webarchiveDirectory, withIntermediateDirectories: true, attributes: nil)
                 }
-                catch { error
+                catch let error {
                     print("create webarchive directory failed : \(error)")
                 }
             }
@@ -44,8 +44,8 @@ class ViewController: UIViewController {
             let url = URL(string: "https://knightsj.github.io/2017/04/10/《OC高级编程》干货三部曲（一）：引用计数篇/".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
             Archiver.logEnabled = true
             Archiver.archiveWebpageFormUrl(url) { (webarchiveData, metaData, error) in
-                guard let data = webarchiveData as? NSData else {
-                    print("no data, error : \(error)")
+                guard let data = webarchiveData as NSData? else {
+                    print("no data, error : \(error?.localizedDescription ?? "")")
                     return
                 }
                 
